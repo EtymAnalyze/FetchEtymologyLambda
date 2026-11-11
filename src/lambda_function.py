@@ -23,15 +23,14 @@ def getLanguageChain(text):
         if prefix == "":
             matches = language_trie.items(word)
         else:
-            print(f"prefix word combine to make '{prefix} {word}'")
             matches = language_trie.items(f"{prefix} {word}")
 
-        print("Matches: ", matches, "Prefix: ", prefix, "Word: ", word)
+        # print("Matches: ", matches, "Prefix: ", prefix, "Word: ", word)
         
         if len(matches) == 0:
             # Not a language, so we just skip to the next word
             prefix = ""
-        elif len(matches) == 1 and matches[0][0] == f"{prefix} {word}":
+        elif len(matches) == 1 and (matches[0][0] == word or matches[0][0] == f"{prefix} {word}"):
             language_chain.append(matches[0][0])
             prefix = ""
         else:
