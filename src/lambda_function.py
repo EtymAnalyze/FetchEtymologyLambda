@@ -21,7 +21,7 @@ def getLanguageChain(text):
         if prefix == "":
             matches = language_trie.items(word)
         else:
-            matches = language_trie.items(f"{prefix}{word}")
+            matches = language_trie.items(f"{prefix} {word}")
 
         print("Matches: ", matches, "Prefix: ", prefix, "Word: ", word)
         
