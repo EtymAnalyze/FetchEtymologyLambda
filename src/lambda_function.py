@@ -4,10 +4,10 @@ from languages import language_trie
 
 api_key = os.environ.get("merriam_webster_api_key")
 
-def getLanguageChain(fullText):
+def getLanguageChain(text):
     # I observed that semicolons often mention words from sibling languages rather than the direct chain of descent
     # Therefore we ultimately want the oldest language in the first chain
-    chainOfDescentText = fullText.split(";")[0]
+    chainOfDescentText = text.split(";")[0]
 
     #Split on whitespace and commas
     words = chainOfDescentText.replace(",", " ").split()
@@ -42,11 +42,22 @@ def fetchEtymology(word):
         data = res.json()
         if data:
             etymology = data[0].get('et', [])
+            if not etymology:
+                return {"fullText": "", "languageChain": []}
             print(f"Fetched etymology JSON for {word}: {etymology}")
-            # TODO: Handle cases where no etymology or multiple etymologies are returned
-            fullText = etymology[0].get('text', '') if etymology else ''
-            return {"fullText": fullText, "languageChain": getLanguageChain(fullText)}
-    raise ValueError("Dictionary API request failed with HTTP status code: {}".format(res.status_code))
+            suppText = ""
+            for entry in etymology:
+                if entry[0] == "text":
+                    mainText = entry[1]
+                elif entry[0] == "et_snote":
+                    suppText = entry[1][0][1]  # Assuming the structure is ["et_snote", [["t", string]]]
+
+            if suppText:
+                fullText += "\n\n" + suppText
+            else:
+                fullText = mainText
+            return {"fullText": fullText, "languageChain": getLanguageChain(mainText)}
+    raise requests.exceptions.HTTPError("Dictionary API request failed with HTTP status code: {}".format(res.status_code))
 
 def lambda_handler(event, context):
     batch_item_failures = []
