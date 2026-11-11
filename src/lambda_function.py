@@ -17,10 +17,13 @@ def getLanguageChain(text):
     # Some languages are multi-word, so we need to check if it's a prefix of a language
     prefix = ""
 
+    print(language_trie.items("Old Norse"))
+
     for word in words:
         if prefix == "":
             matches = language_trie.items(word)
         else:
+            print(f"prefix word combine to make '{prefix} {word}'")
             matches = language_trie.items(f"{prefix} {word}")
 
         print("Matches: ", matches, "Prefix: ", prefix, "Word: ", word)
