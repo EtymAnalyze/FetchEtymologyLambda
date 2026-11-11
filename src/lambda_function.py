@@ -43,7 +43,8 @@ def fetchEtymology(word):
         if data:
             etymology = data[0].get('et', [])
             print(f"Fetched etymology JSON for {word}: {etymology}")
-            fullText = etymology.get('text', '') if etymology else ''
+            # TODO: Handle cases where no etymology or multiple etymologies are returned
+            fullText = etymology[0].get('text', '') if etymology else ''
             return {"fullText": fullText, "languageChain": getLanguageChain(fullText)}
     raise ValueError("Dictionary API request failed with HTTP status code: {}".format(res.status_code))
 
