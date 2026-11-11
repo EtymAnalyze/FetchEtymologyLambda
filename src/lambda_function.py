@@ -21,20 +21,21 @@ def getLanguageChain(text):
         if prefix == "":
             matches = language_trie.items(word)
         else:
-            matches = language_trie.items(f"{prefix} {word}")
+            matches = language_trie.items(f"{prefix}{word}")
 
         print("Matches: ", matches, "Prefix: ", prefix, "Word: ", word)
         
         if len(matches) == 0:
             # Not a language, so we just skip to the next word
             prefix = ""
-            continue
         elif len(matches) == 1 and matches[0][0] == f"{prefix} {word}":
             language_chain.append(matches[0][0])
             prefix = ""
-            continue
         else:
-            prefix += " " + word
+            if prefix == "":
+                prefix = word
+            else:
+                prefix += " " + word
     
     return language_chain
 
