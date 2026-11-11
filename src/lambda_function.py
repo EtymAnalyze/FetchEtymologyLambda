@@ -22,6 +22,9 @@ def getLanguageChain(text):
             matches = language_trie.items(word)
         else:
             matches = language_trie.items(f"{prefix} {word}")
+
+        print("Matches: ", matches, "Prefix: ", prefix, "Word: ", word)
+        
         if len(matches) == 0:
             # Not a language, so we just skip to the next word
             prefix = ""
@@ -44,7 +47,7 @@ def fetchEtymology(word):
             etymology = data[0].get('et', [])
             if not etymology:
                 return {"fullText": "", "languageChain": []}
-            print(f"Fetched etymology JSON for {word}: {etymology}")
+            print(f"Fetched etymology from API for {word}: {etymology}")
             suppText = ""
             for entry in etymology:
                 if entry[0] == "text":
