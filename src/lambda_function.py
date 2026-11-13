@@ -99,7 +99,9 @@ def lambda_handler(event, context):
                 Item={
                     'word': {'S': word},
                     'fullText': {'S': fetch_result['fullText']},
-                    'languageChain': {'SS': fetch_result['languageChain']}
+                    'languageChain': {
+                        'L': [{'S': lang} for lang in fetch_result['languageChain']]
+                    }
                 }
             )
             db_client.put_item(
