@@ -1,4 +1,5 @@
 import requests
+import boto3
 import os
 from languages import language_trie 
 
@@ -17,7 +18,6 @@ def getLanguageChain(text):
     # Some languages are multi-word, so we need to check if it's a prefix of a language
     prefix = ""
 
-    print(language_trie.items("Old Norse"))
 
     for word in words:
         if prefix == "":
@@ -75,12 +75,41 @@ def lambda_handler(event, context):
             # 1. Extract the payload
             word = record['body']
             
-            # 2. Process / Ingest data (e.g., save to DynamoDB, S3, RDS, etc.)
             print(f"Processing message {message_id}: {word}")
-            
             fetch_result = fetchEtymology(word)
             print(f"Fetched etymology for {word}: {fetch_result}")
+
+            db_client = boto3.client('dynamodb')
+
+            if not fetch_result['fullText']:
+                print(f"No etymology found for {word}.")
+                db_client.put_item(
+                                TableName='english_words',
+                                Item={
+                                    'word': {'S': word},
+                                    'MerriamStatus': {'S': 'NoEtymologyFound'},
+                                }
+                            )
+                continue  # Skip to the next message if no etymology is found
+
+            # Insert into DynamoDB
             
+            db_client.put_item(
+                TableName='merriam-webster-etymologies',
+                Item={
+                    'word': {'S': word},
+                    'fullText': {'S': fetch_result['fullText']},
+                    'languageChain': {'SS': fetch_result['languageChain']}
+                }
+            )
+            db_client.put_item(
+                TableName='english-words',
+                Item={
+                    'word': {'S': word},
+                    'MerriamStatus': {'S': 'Fetched'},
+                }
+            )
+
         except Exception as e:
             print(f"Failed to process message {message_id}. Error: {str(e)}")
             # Keep track of failed messages so only they get retried
