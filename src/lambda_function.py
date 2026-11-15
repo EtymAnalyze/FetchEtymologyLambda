@@ -84,7 +84,7 @@ def lambda_handler(event, context):
             if not fetch_result['fullText']:
                 print(f"No etymology found for {word}.")
                 db_client.put_item(
-                                TableName='english_words',
+                                TableName='english-words',
                                 Item={
                                     'word': {'S': word},
                                     'MerriamStatus': {'S': 'NoEtymologyFound'},
