@@ -59,7 +59,7 @@ def fetchEtymology(word):
                     suppText = entry[1][0][1]  # Assuming the structure is ["et_snote", [["t", string]]]
 
             if suppText:
-                fullText += "\n\n" + suppText
+                fullText = mainText + "\n\n" + suppText
             else:
                 fullText = mainText
             return {"fullText": fullText, "languageChain": getLanguageChain(mainText)}
@@ -92,6 +92,7 @@ def lambda_handler(event, context):
                             )
                 continue  # Skip to the next message if no etymology is found
 
+            print("Got Merriam-Webster text: ", fetch_result['fullText'])
             # Insert into DynamoDB
             
             db_client.put_item(
